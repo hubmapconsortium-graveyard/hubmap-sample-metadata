@@ -25,6 +25,10 @@ def main():
             path = os.path.join(dir_path, name)
             print(f'Load: {path}')
             metadata = json.load(open(path))
+            expected_suffix = metadata['schema_type'] + '.json'
+            if not name.endswith(expected_suffix):
+                fails[name] = f'Expected to end with "{expected_suffix}".'
+                continue
             described_by = metadata['describedBy']
             schema_url = urlparse(described_by)
             cache_path = f'schema-cache/{schema_url.hostname}{schema_url.path}'
