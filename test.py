@@ -4,6 +4,7 @@ import os
 import json
 from urllib.parse import urlparse
 from collections import defaultdict
+from pprint import PrettyPrinter
 
 import wget
 from jsonschema import validate
@@ -21,7 +22,7 @@ def download_to(url, target):
 def main():
     fails = defaultdict(dict)
     hubmap_schema = json.load(open('hubmap-schema.json'))
-    
+
     for dir_path, _, file_names in os.walk('workflows'):
         for name in file_names:
             path = os.path.join(dir_path, name)
@@ -29,7 +30,7 @@ def main():
             metadata = json.load(open(path))
             expected_suffix = metadata['schema_type'] + '.json'
             if not name.endswith(expected_suffix):
-                fails[name]['suffix'] = f'Expected to end with "{expected_suffix}".'
+                fails[path]['suffix'] = f'Expected to end with "{expected_suffix}".'
                 continue
             described_by = metadata['describedBy']
             schema_url = urlparse(described_by)
@@ -41,14 +42,15 @@ def main():
             try:
                 validate(instance=metadata, schema=schema)
             except (ValidationError, SchemaError) as e:
-                fails[name]['hca'] = e
+                fails[path]['hca'] = e
             try:
                 validate(instance=metadata, schema=hubmap_schema)
             except (ValidationError, SchemaError) as e:
-                fails[name]['hubmap'] = e
+                fails[path]['hubmap'] = e
 
     if fails:
-        print(fails)
+        PrettyPrinter().pprint(dict(fails))
+        print('FAIL!')
         exit(1)
     else:
         print('PASS!')

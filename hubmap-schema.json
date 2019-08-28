@@ -12,6 +12,19 @@
         "schema_type": {"enum": ["file"]},
         "describedBy": {"enum": ["https://schema.humancellatlas.org/type/file/2.2.0/supplementary_file"]}
       }
+    },
+    {
+      "properties": {
+        "schema_type": {"enum": ["biomaterial"]},
+        "describedBy": {"enum": ["https://schema.humancellatlas.org/type/biomaterial/5.1.0/donor_organism",
+                                 "https://schema.humancellatlas.org/type/biomaterial/5.1.0/specimen_from_organism"]}
+      }
+    },
+    {
+      "properties": {
+        "schema_type": {"enum": ["protocol"]},
+        "describedBy": {"enum": ["https://schema.humancellatlas.org/type/protocol/5.1.0/protocol"]}
+      }
     }
   ]
 }
