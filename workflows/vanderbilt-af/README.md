@@ -1,3 +1,3 @@
 # Vanderbilt AF Workflow
 
-TODO: Show diagram
+![Diagram](vanderbilt-af.svg?sanitize=true)
