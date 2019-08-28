@@ -1,3 +1,7 @@
+schema-cache
+
+## Defaults from github below:
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
