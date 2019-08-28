@@ -36,7 +36,7 @@ def main():
                 validate(instance=metadata, schema=schema)
             except (ValidationError, SchemaError) as e:
                 fails[name] = e
-    if len(fails):
+    if fails:
         print(fails)
         exit(1)
     else:
