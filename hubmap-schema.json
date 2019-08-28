@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "oneOf": [
+    {
+      "properties": {
+        "schema_type": {"enum": ["process"]},
+        "describedBy": {"enum": ["https://schema.humancellatlas.org/type/process/biomaterial_collection/5.1.0/collection_process"]}
+      }
+    },
+    {
+      "properties": {
+        "schema_type": {"enum": ["file"]},
+        "describedBy": {"enum": ["https://schema.humancellatlas.org/type/file/2.2.0/supplementary_file"]}
+      }
+    }
+  ]
+}
