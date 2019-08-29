@@ -22,6 +22,9 @@ def download_to(url, target):
 def main():
     for dir_path, _, file_names in os.walk('workflows'):
         for name in file_names:
+            if not name.endswith('.json') or 'TODO' in name:
+                print(f'Skip: {name}')
+                continue
             path = os.path.join(dir_path, name)
             print(f'Load: {path}')
             metadata = json.load(open(path))
