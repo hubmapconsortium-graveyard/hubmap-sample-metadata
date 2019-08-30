@@ -5,6 +5,8 @@ import json
 from urllib.parse import urlparse
 from collections import defaultdict
 from pprint import PrettyPrinter
+from io import StringIO
+from textwrap import indent
 
 import wget
 from jsonschema import validate
@@ -47,7 +49,11 @@ def validate_json(dir_path, name, fails, hubmap_schema):
 def validate_prov(dir_path, name, fails):
     print(f'\tLoad Provenance: {name}')
     path = os.path.join(dir_path, name)
-    prov.read(path)
+    provenance = prov.read(path)
+    output = StringIO()
+    serializer = prov.serializers.provn.ProvNSerializer(provenance)
+    serializer.serialize(output)
+    print(indent(output.getvalue(), '\t'))
 
 
 def main():
