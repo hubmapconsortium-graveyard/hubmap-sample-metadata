@@ -9,6 +9,7 @@ from pprint import PrettyPrinter
 import wget
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError, SchemaError
+# import prov
 
 
 def download_to(url, target):
@@ -17,6 +18,10 @@ def download_to(url, target):
     if not os.path.exists(target_dir):
         os.makedirs(target_dir)
     os.rename(download_path, target)
+
+
+# TODO:
+# def validate_json(dir_path, name, fails):
 
 
 def main():
