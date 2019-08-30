@@ -21,7 +21,7 @@ def download_to(url, target):
 
 
 def validate_json(dir_path, name, fails, hubmap_schema):
-    print(f'\tLoad: {name}')
+    print(f'\tLoad JSON: {name}')
     path = os.path.join(dir_path, name)
     metadata = json.load(open(path))
     expected_suffix = metadata['schema_type'] + '.json'
@@ -44,6 +44,13 @@ def validate_json(dir_path, name, fails, hubmap_schema):
         fails[path]['hubmap'] = e
 
 
+def validate_prov(dir_path, name, fails):
+    print(f'\tLoad PROV: {name}')
+    path = os.path.join(dir_path, name)
+    if name != 'index.prov':
+        fails[path]['name'] = 'Should be named "index.prov"'
+
+
 def main():
     fails = defaultdict(dict)
     hubmap_schema = json.load(open('hubmap-schema.json'))
@@ -54,6 +61,8 @@ def main():
                 print(f'\tTODO: {name}')
             elif name.endswith('.json'):
                 validate_json(dir_path, name, fails, hubmap_schema)
+            elif name.endswith('.prov'):
+                validate_prov(dir_path, name, fails)
     if fails:
         PrettyPrinter(width=100).pprint(dict(fails))
         print('FAIL!')
