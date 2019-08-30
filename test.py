@@ -66,7 +66,7 @@ def main():
                 print(f'\tTODO: {name}')
             elif name.endswith('.json'):
                 validate_json(dir_path, name, fails, hubmap_schema)
-            elif name == 'prov.ttl':
+            elif name == 'prov.rdf':
                 validate_prov(dir_path, name, fails)
     if fails:
         PrettyPrinter(width=100).pprint(dict(fails))

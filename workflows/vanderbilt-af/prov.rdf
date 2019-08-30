@@ -1,0 +1,18 @@
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix hm: <http://data.hubmapconsortium.org/> .
+
+hm:00-donor-biomaterial
+  a prov:Entity .
+hm:00-clinical-file
+  a prov:Entity ;
+  prov:wasDerivedFrom hm:00-donor-biomaterial .
+
+hm:00-extraction-process
+  a prov:Activity ;
+  prov:used hm:00-extraction-protocol .
+hm:00-extraction-protocol
+  a prov:Entity .
+hm:00-organ-biomaterial
+  a prov:Entity ;
+  prov:wasDerivedFrom hm:00-donor-biomaterial ;
+  prov:wasGeneratedBy hm:00-extraction-process .
