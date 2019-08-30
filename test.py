@@ -9,7 +9,7 @@ from pprint import PrettyPrinter
 import wget
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError, SchemaError
-# import prov
+import prov
 
 
 def download_to(url, target):
@@ -45,10 +45,9 @@ def validate_json(dir_path, name, fails, hubmap_schema):
 
 
 def validate_prov(dir_path, name, fails):
-    print(f'\tLoad PROV: {name}')
+    print(f'\tLoad Provenance: {name}')
     path = os.path.join(dir_path, name)
-    if name != 'index.prov':
-        fails[path]['name'] = 'Should be named "index.prov"'
+    prov.read(path)
 
 
 def main():
@@ -61,7 +60,7 @@ def main():
                 print(f'\tTODO: {name}')
             elif name.endswith('.json'):
                 validate_json(dir_path, name, fails, hubmap_schema)
-            elif name.endswith('.prov'):
+            elif name == 'prov.ttl':
                 validate_prov(dir_path, name, fails)
     if fails:
         PrettyPrinter(width=100).pprint(dict(fails))
