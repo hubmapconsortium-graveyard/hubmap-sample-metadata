@@ -49,7 +49,7 @@ def validate_json(dir_path, name, fails, hubmap_schema):
 def validate_prov(dir_path, name, fails):
     print(f'\tLoad Provenance: {name}')
     path = os.path.join(dir_path, name)
-    provenance = prov.read(path)
+    provenance = prov.read(path, format='rdf')
     output = StringIO()
     serializer = prov.serializers.provn.ProvNSerializer(provenance)
     serializer.serialize(output)
