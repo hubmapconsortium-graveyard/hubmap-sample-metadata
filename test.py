@@ -20,44 +20,42 @@ def download_to(url, target):
     os.rename(download_path, target)
 
 
-# TODO:
-# def validate_json(dir_path, name, fails):
+def validate_json(dir_path, name, fails, hubmap_schema):
+    print(f'\tLoad: {name}')
+    path = os.path.join(dir_path, name)
+    metadata = json.load(open(path))
+    expected_suffix = metadata['schema_type'] + '.json'
+    if not name.endswith(expected_suffix):
+        fails[path]['suffix'] = f'Expected to end with "{expected_suffix}".'
+        return
+    described_by = metadata['describedBy']
+    schema_url = urlparse(described_by)
+    cache_path = f'schema-cache/{schema_url.hostname}{schema_url.path}'
+    if not os.path.isfile(cache_path):
+        download_to(described_by, cache_path)
+    schema = json.load(open(cache_path))
+    try:
+        validate(instance=metadata, schema=schema)
+    except (ValidationError, SchemaError) as e:
+        fails[path]['hca'] = e
+    try:
+        validate(instance=metadata, schema=hubmap_schema)
+    except (ValidationError, SchemaError) as e:
+        fails[path]['hubmap'] = e
 
 
 def main():
     fails = defaultdict(dict)
     hubmap_schema = json.load(open('hubmap-schema.json'))
-
     for dir_path, _, file_names in os.walk('workflows'):
-        for name in file_names:
-            if not name.endswith('.json') or 'TODO' in name:
-                print(f'Skip: {name}')
-                continue
-            path = os.path.join(dir_path, name)
-            print(f'Load: {path}')
-            metadata = json.load(open(path))
-            expected_suffix = metadata['schema_type'] + '.json'
-            if not name.endswith(expected_suffix):
-                fails[path]['suffix'] = f'Expected to end with "{expected_suffix}".'
-                continue
-            described_by = metadata['describedBy']
-            schema_url = urlparse(described_by)
-            cache_path = f'schema-cache/{schema_url.hostname}{schema_url.path}'
-            print(f'Check cache: {cache_path}')
-            if not os.path.isfile(cache_path):
-                download_to(described_by, cache_path)
-            schema = json.load(open(cache_path))
-            try:
-                validate(instance=metadata, schema=schema)
-            except (ValidationError, SchemaError) as e:
-                fails[path]['hca'] = e
-            try:
-                validate(instance=metadata, schema=hubmap_schema)
-            except (ValidationError, SchemaError) as e:
-                fails[path]['hubmap'] = e
-
+        print(f'Testing: {dir_path}')
+        for name in sorted(file_names):
+            if 'TODO' in name:
+                print(f'\tTODO: {name}')
+            elif name.endswith('.json'):
+                validate_json(dir_path, name, fails, hubmap_schema)
     if fails:
-        PrettyPrinter().pprint(dict(fails))
+        PrettyPrinter(width=100).pprint(dict(fails))
         print('FAIL!')
         exit(1)
     else:
