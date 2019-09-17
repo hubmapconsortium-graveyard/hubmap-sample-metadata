@@ -13,7 +13,7 @@ from jsonschema.exceptions import ValidationError, SchemaError
 import prov
 
 
-class TestsContainer(unittest.TestCase):
+class BaseTestCase(unittest.TestCase):
     hubmap_schema = json.load(open('hubmap-schema.json'))
 
 
@@ -82,6 +82,9 @@ def download_to(url, target):
 
 if __name__ == '__main__':
     for dir_path, _, file_names in os.walk('workflows'):
+        dynamic_class_name = f'Test_{dir_path}'
+        DynamicTestCase = type(dynamic_class_name, (BaseTestCase,), {})
+        globals()[dynamic_class_name] = DynamicTestCase
         for name in sorted(file_names):
             if 'TODO' in name:
                 test_function = make_skip_test('TODO')
@@ -91,5 +94,5 @@ if __name__ == '__main__':
                 test_function = make_prov_test('name', dir_path, name)
             else:
                 continue
-            setattr(TestsContainer, 'test_' + name, test_function)
+            setattr(DynamicTestCase, 'test_' + name, test_function)
     unittest.main(verbosity=2)
