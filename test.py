@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+from pathlib import Path
 import json
 from urllib.parse import urlparse
 from collections import defaultdict
@@ -24,7 +25,7 @@ def download_to(url, target):
 
 def validate_json(dir_path, name, fails, hubmap_schema):
     print(f'\tLoad JSON: {name}')
-    path = os.path.join(dir_path, name)
+    path = Path(dir_path) / name
     metadata = json.load(open(path))
     expected_suffix = metadata['schema_type'] + '.json'
     if not name.endswith(expected_suffix):
@@ -48,7 +49,7 @@ def validate_json(dir_path, name, fails, hubmap_schema):
 
 def validate_prov(dir_path, name, fails):
     print(f'\tLoad Provenance: {name}')
-    path = os.path.join(dir_path, name)
+    path = Path(dir_path) / name
     provenance = prov.read(path, format='rdf')
     output = StringIO()
     serializer = prov.serializers.provn.ProvNSerializer(provenance)
