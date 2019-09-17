@@ -43,7 +43,7 @@ def make_json_test(description, dir_path, name):
 
 
 def drop_blank(lines):
-    return set(line for line in lines if line)
+    return set(line for line in lines if line.strip())
 
 
 def make_prov_test(description, dir_path, name):

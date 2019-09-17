@@ -1,5 +1,5 @@
 @prefix prov: <http://www.w3.org/ns/prov#> .
-@prefix hca: <http://data.hubmapconsortium.org/> .
+@prefix hca: <http://data.humancellatlas.org/> .
 @prefix hm-data: <http://data.hubmapconsortium.org/> .
 
 hm-data:00-donor-biomaterial
@@ -23,7 +23,7 @@ hm-data:00-extraction-process
   prov:qualifiedUsage [
     a prov:Usage ;
     prov:entity hm-data:00-donor-biomaterial ;
-    prov:hadRole hca:Source ;
+    prov:hadRole hca:Biomaterial ;
   ] .
 hm-data:00-extraction-protocol
   a prov:Entity ;
