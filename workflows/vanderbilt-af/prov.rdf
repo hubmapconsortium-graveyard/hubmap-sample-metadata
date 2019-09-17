@@ -13,7 +13,18 @@ hm-data:00-clinical-file
 hm-data:00-extraction-process
   a prov:Activity ;
   a hca:Process ;
-  prov:used hm-data:00-extraction-protocol .
+  prov:used hm-data:00-extraction-protocol ;
+  prov:qualifiedUsage [
+    a prov:Usage ;
+    prov:entity hm-data:00-extraction-protocol ;
+    prov:hadRole hca:Protocol ;
+  ] ;
+  prov:used hm-data:00-donor-biomaterial ;
+  prov:qualifiedUsage [
+    a prov:Usage ;
+    prov:entity hm-data:00-donor-biomaterial ;
+    prov:hadRole hca:Source ;
+  ] .
 hm-data:00-extraction-protocol
   a prov:Entity ;
   a hca:Protocol .
