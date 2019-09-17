@@ -81,6 +81,8 @@ def download_to(url, target):
 
 
 if __name__ == '__main__':
+    # Dynamic test creation based on:
+    # https://eli.thegreenplace.net/2014/04/02/dynamically-generating-python-test-cases
     for dir_path, _, file_names in os.walk('workflows'):
         dynamic_class_name = f'Test_{dir_path}'
         DynamicTestCase = type(dynamic_class_name, (BaseTestCase,), {})
