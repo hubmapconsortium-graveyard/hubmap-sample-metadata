@@ -17,7 +17,9 @@ so we will use it in the workflow examples.
 Here is a demonstration of how the two symbologies correspond:
 
 ![Compare HCA to PROV](hca-prov.svg?sanitize=true)
+(All diagrams in this repo are editable with [draw.io](https://www.draw.io/), either on the web or with their desktop app.)
 
 - We are not using the HCA's `Project` entity type.
 - We are using only a fraction of the PROV vocabulary; In particular, for now, we are not using `Agent`.
+- The two systems have different arrow direction conventions.
 - In PROV, `used` relates both the Protocol and Tissue Section to the Process. Roles are distinguished by [`qualifiedUsage`](https://www.w3.org/TR/prov-o/#qualifiedUsage).
