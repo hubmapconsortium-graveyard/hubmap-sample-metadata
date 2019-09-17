@@ -17,6 +17,7 @@ so we will use it in the workflow examples.
 Here is a demonstration of how the two symbologies correspond:
 
 ![Compare HCA to PROV](hca-prov.svg?sanitize=true)
+
 (All diagrams in this repo are editable with [draw.io](https://www.draw.io/), either on the web or with their desktop app.)
 
 - We are not using the HCA's `Project` entity type.
