@@ -17,6 +17,12 @@ class TestsContainer(unittest.TestCase):
     hubmap_schema = json.load(open('hubmap-schema.json'))
 
 
+def make_skip_test(description):
+    def test(self):
+        self.skipTest(description)
+    return test
+
+
 def make_json_test(description, dir_path, name):
     def test(self):
         with open(Path(dir_path) / name) as json_fixture:
@@ -78,11 +84,12 @@ if __name__ == '__main__':
     for dir_path, _, file_names in os.walk('workflows'):
         for name in sorted(file_names):
             if 'TODO' in name:
-                print(f'TODO: {name}')
+                test_function = make_skip_test('TODO')
             elif name.endswith('.json'):
                 test_function = make_json_test('name', dir_path, name)
-                setattr(TestsContainer, 'test_' + name, test_function)
             elif name == 'prov.rdf':
                 test_function = make_prov_test('name', dir_path, name)
-                setattr(TestsContainer, 'test_' + name, test_function)
+            else:
+                continue
+            setattr(TestsContainer, 'test_' + name, test_function)
     unittest.main(verbosity=2)
