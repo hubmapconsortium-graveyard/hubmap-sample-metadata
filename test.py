@@ -26,7 +26,8 @@ def make_json_test(description, dir_path, name):
                 self.fail(f'Expected to end with "{expected_suffix}".')
             described_by = metadata['describedBy']
             schema_url = urlparse(described_by)
-            cache_path = f'schema-cache/{schema_url.hostname}{schema_url.path}'
+            cache_path = Path('schema-cache') / schema_url.hostname / schema_url.path[1:]
+            # Remove leading "/" from URL path component.
             if not os.path.isfile(cache_path):
                 download_to(described_by, cache_path)
             with open(cache_path) as cache_file:
