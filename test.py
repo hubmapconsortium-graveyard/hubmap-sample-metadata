@@ -16,6 +16,7 @@ from filler import Filler
 
 
 class BaseTestCase(unittest.TestCase):
+
     hubmap_schema = json.load(open('hubmap-schema.json'))
 
 
@@ -94,8 +95,11 @@ def fill_templates(path):
         if dir_path.name != 'templates':
             continue
         outputs_dir_path = dir_path.parent / 'outputs'
-        if os.listdir(outputs_dir_path) != ['.gitignore']:
-            raise Exception(f'Expected "{outputs_dir_path}" to be empty')
+        # Clear outputs form previous run:
+        for file in os.listdir(outputs_dir_path):
+            if file != '.gitignore':
+                os.remove(outputs_dir_path / file)
+        # And fill it up again:
         for name in sorted(file_names):
             if not name.endswith('.jsonnet'):
                 raise Exception(f'Expected only ".jsonnet" files in "{dir_path}", not "{name}"')
