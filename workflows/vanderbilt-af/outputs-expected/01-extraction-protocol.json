@@ -1,5 +1,3 @@
-local metadata = import '../inputs/metadata.json';
-
 {
     "protocol_core": {
         "protocol_id": "HM:12345",

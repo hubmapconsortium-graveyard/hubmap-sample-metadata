@@ -26,10 +26,10 @@ def make_skip_test(description):
     return test
 
 
-def make_json_test(description, dir_path, name):
+def make_validity_test(description, dir_path, name):
     def test(self):
-        with open(dir_path / name) as json_fixture:
-            metadata = json.load(json_fixture)
+        with open(dir_path / name) as json_output:
+            metadata = json.load(json_output)
             expected_suffix = metadata['schema_type'] + '.json'
             if not name.endswith(expected_suffix):
                 self.fail(f'Expected to end with "{expected_suffix}".')
@@ -49,6 +49,17 @@ def make_json_test(description, dir_path, name):
                     validate(instance=metadata, schema=self.hubmap_schema)
                 except (ValidationError, SchemaError) as e:
                     self.fail(e)
+    return test
+
+
+def make_equality_test(description, dir_path, name):
+    def test(self):
+        with open(dir_path / name) as actual_output:
+            with open(dir_path.parent / 'outputs-expected' / name) as expected_output:
+                self.assertEqual(
+                    json.load(actual_output),
+                    json.load(expected_output)
+                )
     return test
 
 
@@ -86,12 +97,7 @@ def download_to(url, target):
 def fill_templates(path):
     for dir, _, file_names in os.walk(path):
         dir_path = Path(dir)
-        filler = Filler({
-            # TODO: Read from input dir.
-            # TODO: Actual fill this into the template.
-            'document_id': 'clinical-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
-            'submission_date': '2001-01-01'
-        })
+        filler = Filler()
         if dir_path.name != 'templates':
             continue
         outputs_dir_path = dir_path.parent / 'outputs'
@@ -120,15 +126,15 @@ def test_outputs(path):
         DynamicTestCase = type(dynamic_class_name, (BaseTestCase,), {})
         globals()[dynamic_class_name] = DynamicTestCase
         for name in sorted(file_names):
-            if 'TODO' in name:
-                test_function = make_skip_test('TODO')
-            elif name.endswith('.json'):
-                test_function = make_json_test('name', dir_path, name)
-            elif name == 'prov.rdf':
-                test_function = make_prov_test('name', dir_path, name)
-            else:
-                continue
-            setattr(DynamicTestCase, 'test_' + name, test_function)
+            if name.endswith('.json'):
+                setattr(DynamicTestCase, 'test_validity_' + name,
+                        make_validity_test('name', dir_path, name))
+                setattr(DynamicTestCase, 'test_equality_' + name,
+                        make_equality_test('name', dir_path, name))
+            # TODO:
+            # if name == 'prov.rdf':
+            #     test_function = make_prov_test('name', dir_path, name)
+
     unittest.main(verbosity=2)
 
 

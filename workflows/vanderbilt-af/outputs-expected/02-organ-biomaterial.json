@@ -1,5 +1,3 @@
-local metadata = import '../inputs/metadata.json';
-
 {
     "schema_type": "biomaterial",
     "biomaterial_core": {
