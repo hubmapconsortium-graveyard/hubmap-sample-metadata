@@ -85,11 +85,24 @@ def download_to(url, target):
 def fill_templates(path):
     for dir, _, file_names in os.walk(path):
         dir_path = Path(dir)
-        filler = Filler({})
+        filler = Filler({
+            # TODO: Read from input dir.
+            # TODO: Actual fill this into the template.
+            'document_id': 'clinical-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+            'submission_date': '2001-01-01'
+        })
         if dir_path.name != 'templates':
             continue
+        outputs_dir_path = dir_path.parent / 'outputs'
+        if os.listdir(outputs_dir_path) != ['.gitignore']:
+            raise Exception(f'Expected "{outputs_dir_path}" to be empty')
         for name in sorted(file_names):
-            filler.fill(dir_path / name, dir_path.parent / 'outputs' / name)
+            if not name.endswith('.jsonnet'):
+                raise Exception(f'Expected only ".jsonnet" files in "{dir_path}", not "{name}"')
+            if 'TODO' in name:
+                continue
+            json_name = name.replace('.jsonnet', '.json')
+            filler.fill(dir_path / name, dir_path.parent / 'outputs' / json_name)
 
 
 def test_outputs(path):
