@@ -6,6 +6,7 @@ import json
 from urllib.parse import urlparse
 from io import StringIO
 import unittest
+from shutil import copy
 
 import wget
 from jsonschema import validate
@@ -25,7 +26,7 @@ def make_skip_test(description):
 
 def make_json_test(description, dir_path, name):
     def test(self):
-        with open(Path(dir_path) / name) as json_fixture:
+        with open(dir_path / name) as json_fixture:
             metadata = json.load(json_fixture)
             expected_suffix = metadata['schema_type'] + '.json'
             if not name.endswith(expected_suffix):
@@ -55,7 +56,7 @@ def drop_blank(lines):
 
 def make_prov_test(description, dir_path, name):
     def test(self):
-        rdf_path = Path(dir_path) / name
+        rdf_path = dir_path / name
         provenance = prov.read(rdf_path, format='rdf')
         output = StringIO()
         serializer = prov.serializers.provn.ProvNSerializer(provenance)
@@ -63,7 +64,7 @@ def make_prov_test(description, dir_path, name):
         actual = output.getvalue()
         actual_lines = drop_blank(actual.split('\n'))
 
-        with open(Path(dir_path) / 'prov.prov') as prov_fixture:
+        with open(dir_path / 'prov.prov') as prov_fixture:
             expected_lines = drop_blank(prov_fixture.read().split('\n'))
             self.assertEqual(
                 actual_lines, expected_lines,
@@ -80,10 +81,23 @@ def download_to(url, target):
     os.rename(download_path, target)
 
 
-if __name__ == '__main__':
+def fill_templates(path):
+    for dir, _, file_names in os.walk(path):
+        dir_path = Path(dir)
+        if dir_path.name != 'templates':
+            continue
+        for name in sorted(file_names):
+            # TODO: Fill templates, instead of just copying.
+            copy(dir_path / name, dir_path.parent / 'outputs' / name)
+
+
+def test_outputs(path):
     # Dynamic test creation based on:
     # https://eli.thegreenplace.net/2014/04/02/dynamically-generating-python-test-cases
-    for dir_path, _, file_names in os.walk('workflows'):
+    for dir, _, file_names in os.walk(path):
+        dir_path = Path(dir)
+        if dir_path.name != 'outputs':
+            continue
         dynamic_class_name = f'Test_{dir_path}'
         DynamicTestCase = type(dynamic_class_name, (BaseTestCase,), {})
         globals()[dynamic_class_name] = DynamicTestCase
@@ -98,3 +112,9 @@ if __name__ == '__main__':
                 continue
             setattr(DynamicTestCase, 'test_' + name, test_function)
     unittest.main(verbosity=2)
+
+
+if __name__ == '__main__':
+    target = 'workflows'
+    fill_templates(target)
+    test_outputs(target)
