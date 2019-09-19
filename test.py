@@ -6,12 +6,13 @@ import json
 from urllib.parse import urlparse
 from io import StringIO
 import unittest
-from shutil import copy
 
 import wget
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError, SchemaError
 import prov
+
+from filler import Filler
 
 
 class BaseTestCase(unittest.TestCase):
@@ -84,11 +85,11 @@ def download_to(url, target):
 def fill_templates(path):
     for dir, _, file_names in os.walk(path):
         dir_path = Path(dir)
+        filler = Filler({})
         if dir_path.name != 'templates':
             continue
         for name in sorted(file_names):
-            # TODO: Fill templates, instead of just copying.
-            copy(dir_path / name, dir_path.parent / 'outputs' / name)
+            filler.fill(dir_path / name, dir_path.parent / 'outputs' / name)
 
 
 def test_outputs(path):
