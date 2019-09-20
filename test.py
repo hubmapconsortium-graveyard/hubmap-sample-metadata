@@ -70,19 +70,21 @@ def drop_blank(lines):
 def make_prov_test(description, dir_path, name):
     def test(self):
         prov_json_path = dir_path / name
-        prov.read(prov_json_path, format='json')
-        # output = StringIO()
-        # # serializer = prov.serializers.provn.ProvNSerializer(provenance)
-        # # serializer.serialize(output)
-        # # actual = output.getvalue()
-        # # actual_lines = drop_blank(actual.split('\n'))
-        # #
-        # # with open(dir_path / 'prov.prov') as prov_fixture:
-        # #     expected_lines = drop_blank(prov_fixture.read().split('\n'))
-        # #     self.assertEqual(
-        # #         actual_lines, expected_lines,
-        # #         msg=f'Copying this to prov.prov might fix the problem:\n{actual}'
-        # #     )
+        provenance = prov.read(prov_json_path, format='json')
+        output = StringIO()
+        # In production, we won't output PROV-N,
+        # but for tests, it's easy for a human to read, and easy to compare.
+        serializer = prov.serializers.provn.ProvNSerializer(provenance)
+        serializer.serialize(output)
+        actual = output.getvalue()
+        actual_lines = drop_blank(actual.split('\n'))
+
+        with open(dir_path.parent / 'expected.prov') as prov_fixture:
+            expected_lines = drop_blank(prov_fixture.read().split('\n'))
+            self.assertEqual(
+                actual_lines, expected_lines,
+                msg=f'Expected this PROV:\n{actual}'
+            )
     return test
 
 
