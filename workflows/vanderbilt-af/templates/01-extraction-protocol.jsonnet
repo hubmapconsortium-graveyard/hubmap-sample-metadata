@@ -1,6 +1,4 @@
-local metadata = import '../inputs/metadata.json';
-
-{
+function(_) {
     "protocol_core": {
         "protocol_id": "HM:12345",
         "protocols_io_doi": "12345/protocols.io.12345",

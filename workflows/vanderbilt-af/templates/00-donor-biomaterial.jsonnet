@@ -1,6 +1,4 @@
-local metadata = import '../inputs/metadata.json';
-
-{
+function(_) {
     "schema_type": "biomaterial",
     "biomaterial_core": {
         "ncbi_taxon_id": [12345],

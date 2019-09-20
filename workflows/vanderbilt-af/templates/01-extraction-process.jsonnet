@@ -1,6 +1,4 @@
-local metadata = import '../inputs/metadata.json';
-
-{
+function(_) {
     "schema_type": "process",
     "describedBy": "https://schema.humancellatlas.org/type/process/biomaterial_collection/5.1.0/collection_process",
     "process_core": {

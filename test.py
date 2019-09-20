@@ -97,14 +97,20 @@ def download_to(url, target):
 def fill_templates(path):
     for dir, _, file_names in os.walk(path):
         dir_path = Path(dir)
-        filler = Filler()
         if dir_path.name != 'templates':
             continue
-        outputs_dir_path = dir_path.parent / 'outputs'
+
+        # Initialize template filler:
+        input_metadata_path = dir_path.parent / 'inputs' / 'metadata.json'
+        with open(input_metadata_path) as input_metadata:
+            filler = Filler(json.load(input_metadata))
+
         # Clear outputs form previous run:
+        outputs_dir_path = dir_path.parent / 'outputs'
         for file in os.listdir(outputs_dir_path):
             if file != '.gitignore':
                 os.remove(outputs_dir_path / file)
+
         # And fill it up again:
         for name in sorted(file_names):
             if not name.endswith('.jsonnet'):

@@ -1,13 +1,11 @@
-local metadata = import '../inputs/metadata.json';
-
-{
+function(_) {
     "file_core": {
         "file_name": "clinical-data.txt",
         "format": "txt"
     },
     "provenance": {
-        "document_id": metadata.document_id,
-        "submission_date": metadata.submission_date
+        "document_id": _.document_id,
+        "submission_date": _.submission_date
     },
     "file_description": "Clinicial data export",
     "schema_type": "file",
