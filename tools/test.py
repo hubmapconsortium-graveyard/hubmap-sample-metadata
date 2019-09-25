@@ -19,13 +19,15 @@ class BaseTestCase(unittest.TestCase):
     hubmap_schema = json.load(open('hubmap-schema.json'))
 
 
-def make_skip_test(description):
-    def test(self):
-        self.skipTest(description)
-    return test
-
-
 def make_validity_test(description, dir_path, name):
+
+    def download_to(url, target):
+        download_path = wget.download(url)
+        target_dir = os.path.dirname(target)
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+        os.rename(download_path, target)
+
     def test(self):
         with open(dir_path / name) as json_output:
             metadata = json.load(json_output)
@@ -62,11 +64,11 @@ def make_equality_test(description, dir_path, name):
     return test
 
 
-def drop_blank(lines):
-    return set(line for line in lines if line.strip())
-
-
 def make_prov_test(description, dir_path, name):
+
+    def drop_blank(lines):
+        return set(line for line in lines if line.strip())
+
     def test(self):
         prov_json_path = dir_path / name
         provenance = prov.read(prov_json_path, format='json')
@@ -85,14 +87,6 @@ def make_prov_test(description, dir_path, name):
                 msg=f'Expected this PROV:\n{actual}'
             )
     return test
-
-
-def download_to(url, target):
-    download_path = wget.download(url)
-    target_dir = os.path.dirname(target)
-    if not os.path.exists(target_dir):
-        os.makedirs(target_dir)
-    os.rename(download_path, target)
 
 
 def fill_templates_hca(path):
