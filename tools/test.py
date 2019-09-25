@@ -12,7 +12,7 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError, SchemaError
 import prov
 
-from fill_templates import fill_templates
+from fill_templates import single_fill_templates, multi_fill_templates
 
 
 class BaseTestCase(unittest.TestCase):
@@ -96,7 +96,17 @@ def fill_templates_hca(path):
             continue
         input_path = dir_path.parent / 'inputs' / 'metadata.json'
         outputs_path = dir_path.parent / 'outputs-hca' / 'actual'
-        fill_templates(input_path, dir_path, outputs_path, clear_target=True)
+        single_fill_templates(input_path, dir_path, outputs_path, clear_target=True)
+
+
+def fill_templates_indexing(path):
+    for dir, _, file_names in os.walk(path):
+        dir_path = Path(dir)
+        if dir_path.name != 'templates-indexing':
+            continue
+        inputs_path = dir_path.parent / 'outputs-hcs' / 'expected'
+        outputs_path = dir_path.parent / 'outputs-indexing' / 'actual'
+        multi_fill_templates(inputs_path, dir_path, outputs_path, clear_target=True)
 
 
 def test_outputs(path):
@@ -125,7 +135,7 @@ def test_outputs(path):
 if __name__ == '__main__':
     target = 'workflows'
     fill_templates_hca(target)
-    # fill_templates_indexing(target)
+    fill_templates_indexing(target)
     test_outputs(target)
     # test_outputs_indexing(target)
 
