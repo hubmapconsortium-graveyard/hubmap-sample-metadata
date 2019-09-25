@@ -54,7 +54,7 @@ def make_validity_test(description, dir_path, name):
 def make_equality_test(description, dir_path, name):
     def test(self):
         with open(dir_path / name) as actual_output:
-            with open(dir_path.parent / 'outputs-hca-expected' / name) as expected_output:
+            with open(dir_path.parent / 'expected' / name) as expected_output:
                 self.assertEqual(
                     json.load(actual_output),
                     json.load(expected_output)
@@ -122,7 +122,7 @@ def fill_templates_hca(path):
             filler.fill(dir_path / name, outputs_hca_dir_path / json_name)
 
 
-def test_outputs_hca(path, sub_dir):
+def test_outputs(path):
     # Dynamic test creation based on:
     # https://eli.thegreenplace.net/2014/04/02/dynamically-generating-python-test-cases
     for dir, _, file_names in os.walk(path):
@@ -145,12 +145,11 @@ def test_outputs_hca(path, sub_dir):
                 raise Exception(f'Unexpected file type: "{name}"')
 
 
-
 if __name__ == '__main__':
     target = 'workflows'
     fill_templates_hca(target)
     # fill_templates_indexing(target)
-    test_outputs_hca(target)
+    test_outputs(target)
     # test_outputs_indexing(target)
 
     unittest.main(verbosity=2)
