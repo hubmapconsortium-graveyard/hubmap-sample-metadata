@@ -19,7 +19,7 @@ class BaseTestCase(unittest.TestCase):
     hubmap_schema = json.load(open('hubmap-schema.json'))
 
 
-def make_validity_test(description, dir_path, name):
+def make_hca_validity_test(description, dir_path, name):
 
     def download_to(url, target):
         download_path = wget.download(url)
@@ -120,14 +120,15 @@ def test_outputs(path):
         DynamicTestCase = type(dynamic_class_name, (BaseTestCase,), {})
         globals()[dynamic_class_name] = DynamicTestCase
         for name in sorted(file_names):
-            if name == 'prov.json':
-                setattr(DynamicTestCase, 'test_prov\t' + name,
-                        make_prov_test('name', dir_path, name))
-            elif name.endswith('.json'):
-                setattr(DynamicTestCase, 'test_validity\t' + name,
-                        make_validity_test('name', dir_path, name))
+            if name.endswith('.json'):
                 setattr(DynamicTestCase, 'test_equality\t' + name,
                         make_equality_test('name', dir_path, name))
+                if name == 'prov.json':
+                    setattr(DynamicTestCase, 'test_prov\t' + name,
+                            make_prov_test('name', dir_path, name))
+                else:
+                    setattr(DynamicTestCase, 'test_hca_validity\t' + name,
+                            make_hca_validity_test('name', dir_path, name))
             else:
                 raise Exception(f'Unexpected file type: "{name}"')
 
