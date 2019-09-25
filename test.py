@@ -12,7 +12,7 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError, SchemaError
 import prov
 
-from filler import Filler
+from tools.fill_templates import fill_templates
 
 
 class BaseTestCase(unittest.TestCase):
@@ -100,26 +100,9 @@ def fill_templates_hca(path):
         dir_path = Path(dir)
         if dir_path.name != 'templates-hca':
             continue
-
-        # Initialize template filler:
-        input_metadata_path = dir_path.parent / 'inputs' / 'metadata.json'
-        with open(input_metadata_path) as input_metadata:
-            filler = Filler(json.load(input_metadata))
-
-        # Clear outputs-hca from previous run:
-        outputs_hca_dir_path = dir_path.parent / 'outputs-hca' / 'actual'
-        for file in os.listdir(outputs_hca_dir_path):
-            if file != '.gitignore':
-                os.remove(outputs_hca_dir_path / file)
-
-        # And fill it up again:
-        for name in sorted(file_names):
-            if not name.endswith('.jsonnet'):
-                raise Exception(f'Expected only ".jsonnet" files in "{dir_path}", not "{name}"')
-            if 'TODO' in name:
-                continue
-            json_name = name.replace('.jsonnet', '.json')
-            filler.fill(dir_path / name, outputs_hca_dir_path / json_name)
+        input_path = dir_path.parent / 'inputs' / 'metadata.json'
+        outputs_path = dir_path.parent / 'outputs-hca' / 'actual'
+        fill_templates(input_path, dir_path, outputs_path, clear_target=True)
 
 
 def test_outputs(path):
