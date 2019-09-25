@@ -38,10 +38,10 @@ if __name__ == '__main__':
         help='single JSON input file')
     parser.add_argument(
         '--template', type=str, required=True,
-        help='template directory')
+        help='template directory containing JSONNET files')
     parser.add_argument(
         '--target', type=str, required=True,
-        help='target directory')
+        help='target directory to be filled with JSON files')
     parser.add_argument(
         '--clear', action='store_true',
         help='clear target directory before regenerating?'
