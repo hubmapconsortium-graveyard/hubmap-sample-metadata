@@ -55,7 +55,7 @@ def make_validity_test(description, dir_path, name):
 def make_equality_test(description, dir_path, name):
     def test(self):
         with open(dir_path / name) as actual_output:
-            with open(dir_path.parent / 'outputs-expected' / name) as expected_output:
+            with open(dir_path.parent / 'outputs-hca-expected' / name) as expected_output:
                 self.assertEqual(
                     json.load(actual_output),
                     json.load(expected_output)
@@ -107,11 +107,11 @@ def fill_templates(path):
         with open(input_metadata_path) as input_metadata:
             filler = Filler(json.load(input_metadata))
 
-        # Clear outputs from previous run:
-        outputs_dir_path = dir_path.parent / 'outputs'
-        for file in os.listdir(outputs_dir_path):
+        # Clear outputs-hca from previous run:
+        outputs_hca_dir_path = dir_path.parent / 'outputs-hca'
+        for file in os.listdir(outputs_hca_dir_path):
             if file != '.gitignore':
-                os.remove(outputs_dir_path / file)
+                os.remove(outputs_hca_dir_path / file)
 
         # And fill it up again:
         for name in sorted(file_names):
@@ -120,15 +120,15 @@ def fill_templates(path):
             if 'TODO' in name:
                 continue
             json_name = name.replace('.jsonnet', '.json')
-            filler.fill(dir_path / name, dir_path.parent / 'outputs' / json_name)
+            filler.fill(dir_path / name, dir_path.parent / 'outputs-hca' / json_name)
 
 
-def test_outputs(path):
+def test_outputs_hca(path):
     # Dynamic test creation based on:
     # https://eli.thegreenplace.net/2014/04/02/dynamically-generating-python-test-cases
     for dir, _, file_names in os.walk(path):
         dir_path = Path(dir)
-        if dir_path.name != 'outputs':
+        if dir_path.name != 'outputs-hca':
             continue
         dynamic_class_name = f'Test\t{dir_path}'
         DynamicTestCase = type(dynamic_class_name, (BaseTestCase,), {})
@@ -153,4 +153,4 @@ def test_outputs(path):
 if __name__ == '__main__':
     target = 'workflows'
     fill_templates(target)
-    test_outputs(target)
+    test_outputs_hca(target)
