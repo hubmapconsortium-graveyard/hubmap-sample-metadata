@@ -16,7 +16,6 @@ from filler import Filler
 
 
 class BaseTestCase(unittest.TestCase):
-
     hubmap_schema = json.load(open('hubmap-schema.json'))
 
 
@@ -96,10 +95,10 @@ def download_to(url, target):
     os.rename(download_path, target)
 
 
-def fill_templates(path):
+def fill_templates_hca(path):
     for dir, _, file_names in os.walk(path):
         dir_path = Path(dir)
-        if dir_path.name != 'templates':
+        if dir_path.name != 'templates-hca':
             continue
 
         # Initialize template filler:
@@ -108,7 +107,7 @@ def fill_templates(path):
             filler = Filler(json.load(input_metadata))
 
         # Clear outputs-hca from previous run:
-        outputs_hca_dir_path = dir_path.parent / 'outputs-hca'
+        outputs_hca_dir_path = dir_path.parent / 'outputs-hca' / 'actual'
         for file in os.listdir(outputs_hca_dir_path):
             if file != '.gitignore':
                 os.remove(outputs_hca_dir_path / file)
@@ -120,23 +119,21 @@ def fill_templates(path):
             if 'TODO' in name:
                 continue
             json_name = name.replace('.jsonnet', '.json')
-            filler.fill(dir_path / name, dir_path.parent / 'outputs-hca' / json_name)
+            filler.fill(dir_path / name, outputs_hca_dir_path / json_name)
 
 
-def test_outputs_hca(path):
+def test_outputs_hca(path, sub_dir):
     # Dynamic test creation based on:
     # https://eli.thegreenplace.net/2014/04/02/dynamically-generating-python-test-cases
     for dir, _, file_names in os.walk(path):
         dir_path = Path(dir)
-        if dir_path.name != 'outputs-hca':
+        if dir_path.name != 'expected':
             continue
         dynamic_class_name = f'Test\t{dir_path}'
         DynamicTestCase = type(dynamic_class_name, (BaseTestCase,), {})
         globals()[dynamic_class_name] = DynamicTestCase
         for name in sorted(file_names):
-            if name == '.gitignore':
-                pass
-            elif name == 'prov.json':
+            if name == 'prov.json':
                 setattr(DynamicTestCase, 'test_prov\t' + name,
                         make_prov_test('name', dir_path, name))
             elif name.endswith('.json'):
@@ -147,10 +144,13 @@ def test_outputs_hca(path):
             else:
                 raise Exception(f'Unexpected file type: "{name}"')
 
-    unittest.main(verbosity=2)
 
 
 if __name__ == '__main__':
     target = 'workflows'
-    fill_templates(target)
+    fill_templates_hca(target)
+    # fill_templates_indexing(target)
     test_outputs_hca(target)
+    # test_outputs_indexing(target)
+
+    unittest.main(verbosity=2)
