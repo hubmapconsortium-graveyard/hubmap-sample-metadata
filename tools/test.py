@@ -19,6 +19,21 @@ class BaseTestCase(unittest.TestCase):
     hubmap_schema = json.load(open('hubmap-schema.json'))
 
 
+def make_indexing_validity_test(description, dir_path, name):
+
+    def test(self):
+        pass
+        # TODO: Make a schema for the indexing files, and validate against it!
+
+        # with open(dir_path.parent / 'actual' / name) as json_output:
+        #     schema = json.load(schema_file)
+        #     try:
+        #         validate(instance=metadata, schema=schema)
+        #     except (ValidationError, SchemaError) as e:
+        #         self.fail(e)
+    return test
+
+
 def make_hca_validity_test(description, dir_path, name):
 
     def download_to(url, target):
@@ -29,7 +44,7 @@ def make_hca_validity_test(description, dir_path, name):
         os.rename(download_path, target)
 
     def test(self):
-        with open(dir_path / name) as json_output:
+        with open(dir_path.parent / 'actual' / name) as json_output:
             metadata = json.load(json_output)
             expected_suffix = metadata['schema_type'] + '.json'
             if not name.endswith(expected_suffix):
@@ -55,8 +70,8 @@ def make_hca_validity_test(description, dir_path, name):
 
 def make_equality_test(description, dir_path, name):
     def test(self):
-        with open(dir_path / name) as actual_output:
-            with open(dir_path.parent / 'expected' / name) as expected_output:
+        with open(dir_path.parent / 'actual' / name) as actual_output:
+            with open(dir_path / name) as expected_output:
                 self.assertEqual(
                     json.load(actual_output),
                     json.load(expected_output)
@@ -104,7 +119,7 @@ def fill_templates_indexing(path):
         dir_path = Path(dir)
         if dir_path.name != 'templates-indexing':
             continue
-        inputs_path = dir_path.parent / 'outputs-hcs' / 'expected'
+        inputs_path = dir_path.parent / 'outputs-hca' / 'expected'
         outputs_path = dir_path.parent / 'outputs-indexing' / 'actual'
         multi_fill_templates(inputs_path, dir_path, outputs_path, clear_target=True)
 
@@ -121,14 +136,20 @@ def test_outputs(path):
         globals()[dynamic_class_name] = DynamicTestCase
         for name in sorted(file_names):
             if name.endswith('.json'):
+                # All outputs should be equal to their fixtures:
                 setattr(DynamicTestCase, 'test_equality\t' + name,
                         make_equality_test('name', dir_path, name))
+
+                # "Valid" is different for different types of files:
                 if name == 'prov.json':
                     setattr(DynamicTestCase, 'test_prov\t' + name,
                             make_prov_test('name', dir_path, name))
-                else:
+                elif dir_path.parent.name == 'outputs-hca':
                     setattr(DynamicTestCase, 'test_hca_validity\t' + name,
                             make_hca_validity_test('name', dir_path, name))
+                elif dir_path.parent.name == 'outputs-indexing':
+                    setattr(DynamicTestCase, 'test_indexing_validity\t' + name,
+                            make_indexing_validity_test('name', dir_path, name))
             else:
                 raise Exception(f'Unexpected file type: "{name}"')
 

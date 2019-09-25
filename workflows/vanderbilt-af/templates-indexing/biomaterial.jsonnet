@@ -1,3 +1,0 @@
-function(_) {
-    "type": "biomaterial"
-}

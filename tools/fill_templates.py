@@ -39,7 +39,12 @@ def single_fill_templates(input_metadata_path, templates, target, clear_target=F
 
 def multi_fill_templates(inputs, templates, target, clear_target=False):
     '''Given multiple inputs and multiple templates, combine the inputs and fill the templates.'''
-    # TODO
+    input_dict = {}
+    for filename in os.listdir(inputs):
+        with open(Path(inputs) / filename) as input_json:
+            # TODO: Strip filename
+            input_dict[filename] = json.load(input_json)
+    _fill_templates_with_dict(input_dict, templates, target)
 
 
 if __name__ == '__main__':
@@ -49,7 +54,7 @@ if __name__ == '__main__':
         fill each template and save in target directory.''')
     parser.add_argument(
         '--input', type=str, required=True,
-        help='single JSON input file')
+        help='either a single JSON file, or a directory of JSON files')
     parser.add_argument(
         '--template', type=str, required=True,
         help='template directory containing JSONNET files')
@@ -62,4 +67,7 @@ if __name__ == '__main__':
     )
 
     args = parser.parse_args()
-    single_fill_templates(args.input, args.template, args.target, clear_target=args.clear)
+    if os.path.isdir(args.input):
+        multi_fill_templates(args.input, args.template, args.target, clear_target=args.clear)
+    else:
+        single_fill_templates(args.input, args.template, args.target, clear_target=args.clear)
