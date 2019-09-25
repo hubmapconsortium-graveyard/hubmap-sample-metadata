@@ -12,7 +12,7 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError, SchemaError
 import prov
 
-from tools.fill_templates import fill_templates
+from fill_templates import fill_templates
 
 
 class BaseTestCase(unittest.TestCase):

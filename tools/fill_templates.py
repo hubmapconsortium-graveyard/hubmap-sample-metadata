@@ -4,7 +4,7 @@ from pathlib import Path
 import json
 import os
 
-from .filler import Filler
+from filler import Filler
 
 
 def fill_templates(input_metadata_path, templates, target, clear_target=False):
@@ -32,7 +32,10 @@ def fill_templates(input_metadata_path, templates, target, clear_target=False):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Given input JSON and a directory of templates, fill each template and save in target directory.')
+    parser = argparse.ArgumentParser(
+        description='''
+        Given input JSON and a directory of templates,
+        fill each template and save in target directory.''')
     parser.add_argument(
         '--input', type=str, required=True,
         help='single JSON input file')
