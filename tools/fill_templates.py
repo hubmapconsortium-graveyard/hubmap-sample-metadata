@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-import argparse
 from pathlib import Path
 import json
 import os
@@ -46,29 +44,3 @@ def multi_fill_templates(inputs, templates, target, clear_target=False):
             stem = re.sub(r'(?:^\d+-)?(.+)\.json$', r'\1', filename)
             input_dict[stem] = json.load(input_json)
     _fill_templates_with_dict(input_dict, templates, target)
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(
-        description='''
-        Given input JSON and a directory of templates,
-        fill each template and save in target directory.''')
-    parser.add_argument(
-        '--input', type=str, required=True,
-        help='either a single JSON file, or a directory of JSON files')
-    parser.add_argument(
-        '--template', type=str, required=True,
-        help='template directory containing JSONNET files')
-    parser.add_argument(
-        '--target', type=str, required=True,
-        help='target directory to be filled with JSON files')
-    parser.add_argument(
-        '--clear', action='store_true',
-        help='clear target directory before regenerating?'
-    )
-
-    args = parser.parse_args()
-    if os.path.isdir(args.input):
-        multi_fill_templates(args.input, args.template, args.target, clear_target=args.clear)
-    else:
-        single_fill_templates(args.input, args.template, args.target, clear_target=args.clear)

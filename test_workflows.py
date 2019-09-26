@@ -7,7 +7,6 @@ from glob import glob
 
 import wget
 from jsonschema import validate
-from jsonschema.exceptions import ValidationError, SchemaError
 import prov
 import pytest
 
@@ -56,7 +55,7 @@ def test_valid_hca_json_their_schema(path):
     metadata = json.load(open(path))
     expected_suffix = metadata['schema_type'] + '.json'
     if not path.endswith(expected_suffix):
-        self.fail(f'Expected to end with "{expected_suffix}".')
+        raise Exception(f'Expected to end with "{expected_suffix}".')
     described_by = metadata['describedBy']
     schema_url = urlparse(described_by)
     cache_path = Path('schema-cache') / schema_url.hostname / schema_url.path[1:]
@@ -73,7 +72,6 @@ def test_valid_hca_json_our_schema(path):
     metadata = json.load(open(path))
     hubmap_indexing_schema = json.load(open('hubmap-hca-schema.json'))
     validate(instance=metadata, schema=hubmap_indexing_schema)
-
 
 
 @pytest.mark.parametrize('path', indexing_paths)
