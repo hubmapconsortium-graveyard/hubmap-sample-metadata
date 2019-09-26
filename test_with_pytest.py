@@ -14,7 +14,7 @@ import pytest
 from tools.fill_templates import single_fill_templates, multi_fill_templates
 
 
-def fill_templates():
+def create_actuals():
     for templates_dir in glob('workflows/*/templates-hca'):
         templates_path = Path(templates_dir)
         input_path = templates_path.parent / 'inputs' / 'metadata.json'
@@ -29,16 +29,24 @@ def fill_templates():
 
 # Templates must be filled BEFORE tests are parametrized with glob;
 # A setup method would run too late.
-fill_templates()
+create_actuals()
 
 # "*-*" to exclude "prov.json"
-hca_paths = glob('workflows/*/outputs-hca/actual/*-*')
-indexing_paths = glob('workflows/*/outputs-indexing/actual/*')
-all_actual_json_paths = glob('workflows/*/outputs-*/actual/*')
+hca_paths = sorted(glob('workflows/*/outputs-hca/actual/*-*'))
+indexing_paths = sorted(glob('workflows/*/outputs-indexing/actual/*'))
+all_actual_json_paths = sorted(glob('workflows/*/outputs-*/actual/*'))
+prov_paths = sorted(glob('workflows/*/outputs-hca/actual/prov.json'))
+
+
+def test_all_globs_match():
+    assert len(hca_paths)
+    assert len(indexing_paths)
+    assert len(all_actual_json_paths)
+    assert len(prov_paths)
 
 
 @pytest.mark.parametrize('path', hca_paths)
-def test_valid_any_hca_json(path):
+def test_valid_hca_json_their_schema(path):
     def download_to(url, target):
         download_path = wget.download(url)
         target_dir = os.path.dirname(target)
@@ -61,7 +69,7 @@ def test_valid_any_hca_json(path):
 
 
 @pytest.mark.parametrize('path', hca_paths)
-def test_valid_fixed_hca_json(path):
+def test_valid_hca_json_our_schema(path):
     metadata = json.load(open(path))
     hubmap_indexing_schema = json.load(open('hubmap-hca-schema.json'))
     validate(instance=metadata, schema=hubmap_indexing_schema)
@@ -69,7 +77,7 @@ def test_valid_fixed_hca_json(path):
 
 
 @pytest.mark.parametrize('path', indexing_paths)
-def test_valid_indexing_json(path):
+def test_valid_indexing_json_our_schema(path):
     metadata = json.load(open(path))
     hubmap_indexing_schema = json.load(open('hubmap-indexing-schema.json'))
     validate(instance=metadata, schema=hubmap_indexing_schema)
@@ -81,3 +89,20 @@ def test_equality(path):
     with open(path) as actual_output:
         with open(wrapped_path.parent.parent / 'expected' / wrapped_path.name) as expected_output:
             assert json.load(actual_output) == json.load(expected_output)
+
+
+@pytest.mark.parametrize('path', prov_paths)
+def test_prov(path):
+    def drop_blank(lines):
+        return set(line for line in lines if line.strip())
+    provenance = prov.read(path, format='json')
+    output = StringIO()
+    # In production, we won't output PROV-N,
+    # but for tests, it's easy for a human to read, and easy to compare.
+    serializer = prov.serializers.provn.ProvNSerializer(provenance)
+    serializer.serialize(output)
+    actual = output.getvalue()
+    actual_lines = drop_blank(actual.split('\n'))
+    with open(Path(path).parent.parent / 'expected.prov') as prov_fixture:
+        expected_lines = drop_blank(prov_fixture.read().split('\n'))
+        assert actual_lines == expected_lines
