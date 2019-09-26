@@ -33,10 +33,18 @@ fill_templates()
 
 # "*-*" to exclude "prov.json"
 hca_paths = glob('workflows/*/outputs-hca/actual/*-*')
+indexing_paths = glob('workflows/*/outputs-indexing/actual/*')
+all_actual_json_paths = glob('workflows/*/outputs-*/actual/*')
 
 
 @pytest.mark.parametrize('path', hca_paths)
 def test_valid_any_hca_json(path):
+    def download_to(url, target):
+        download_path = wget.download(url)
+        target_dir = os.path.dirname(target)
+        if not os.path.exists(target_dir):
+            os.makedirs(target_dir)
+        os.rename(download_path, target)
     metadata = json.load(open(path))
     expected_suffix = metadata['schema_type'] + '.json'
     if not path.endswith(expected_suffix):
@@ -59,9 +67,17 @@ def test_valid_fixed_hca_json(path):
     validate(instance=metadata, schema=hubmap_indexing_schema)
 
 
-indexing_paths = glob('workflows/*/outputs-indexing/actual/*')
+
 @pytest.mark.parametrize('path', indexing_paths)
 def test_valid_indexing_json(path):
     metadata = json.load(open(path))
     hubmap_indexing_schema = json.load(open('hubmap-indexing-schema.json'))
     validate(instance=metadata, schema=hubmap_indexing_schema)
+
+
+@pytest.mark.parametrize('path', all_actual_json_paths)
+def test_equality(path):
+    wrapped_path = Path(path)
+    with open(path) as actual_output:
+        with open(wrapped_path.parent.parent / 'expected' / wrapped_path.name) as expected_output:
+            assert json.load(actual_output) == json.load(expected_output)
