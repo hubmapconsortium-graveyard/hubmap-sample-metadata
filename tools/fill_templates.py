@@ -5,7 +5,7 @@ import json
 import os
 import re
 
-from filler import Filler
+from .filler import Filler
 
 
 def _fill_templates_with_dict(input_dict, templates, target, clear_target=False):
