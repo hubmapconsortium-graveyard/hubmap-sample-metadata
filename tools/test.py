@@ -16,21 +16,18 @@ from fill_templates import single_fill_templates, multi_fill_templates
 
 
 class BaseTestCase(unittest.TestCase):
-    hubmap_schema = json.load(open('hubmap-schema.json'))
+    hubmap_hca_schema = json.load(open('hubmap-hca-schema.json'))
+    hubmap_indexing_schema = json.load(open('hubmap-indexing-schema.json'))
 
 
 def make_indexing_validity_test(description, dir_path, name):
-
     def test(self):
-        pass
-        # TODO: Make a schema for the indexing files, and validate against it!
-
-        # with open(dir_path.parent / 'actual' / name) as json_output:
-        #     schema = json.load(schema_file)
-        #     try:
-        #         validate(instance=metadata, schema=schema)
-        #     except (ValidationError, SchemaError) as e:
-        #         self.fail(e)
+        with open(dir_path.parent / 'actual' / name) as json_output:
+            metadata = json.load(json_output)
+            try:
+                validate(instance=metadata, schema=self.hubmap_indexing_schema)
+            except (ValidationError, SchemaError) as e:
+                self.fail(e)
     return test
 
 
@@ -62,7 +59,7 @@ def make_hca_validity_test(description, dir_path, name):
                 except (ValidationError, SchemaError) as e:
                     self.fail(e)
                 try:
-                    validate(instance=metadata, schema=self.hubmap_schema)
+                    validate(instance=metadata, schema=self.hubmap_hca_schema)
                 except (ValidationError, SchemaError) as e:
                     self.fail(e)
     return test

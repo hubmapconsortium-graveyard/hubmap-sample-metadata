@@ -1,3 +1,4 @@
 function(_) {
-    "just-a-demo": _['clinical-file']['provenance']['document_id']
+  "type": "file",
+  "TODO_placeholder": _['clinical-file']['provenance']['document_id']
 }
