@@ -3,6 +3,7 @@ import argparse
 from pathlib import Path
 import json
 import os
+import re
 
 from filler import Filler
 
@@ -42,8 +43,8 @@ def multi_fill_templates(inputs, templates, target, clear_target=False):
     input_dict = {}
     for filename in os.listdir(inputs):
         with open(Path(inputs) / filename) as input_json:
-            # TODO: Strip filename
-            input_dict[filename] = json.load(input_json)
+            stem = re.sub(r'(?:^\d+-)?(.+)\.json$', r'\1', filename)
+            input_dict[stem] = json.load(input_json)
     _fill_templates_with_dict(input_dict, templates, target)
 
 
