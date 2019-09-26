@@ -15,6 +15,11 @@ from tools.fill_templates import single_fill_templates, multi_fill_templates
 
 
 def fill_templates():
+    for templates_dir in glob('workflows/*/templates-hca'):
+        templates_path = Path(templates_dir)
+        input_path = templates_path.parent / 'inputs' / 'metadata.json'
+        outputs_path = templates_path.parent / 'outputs-hca' / 'actual'
+        single_fill_templates(input_path, templates_path, outputs_path, clear_target=True)
     for templates_dir in glob('workflows/*/templates-indexing'):
         templates_path = Path(templates_dir)
         inputs_path = templates_path.parent / 'outputs-hca' / 'expected'
@@ -26,7 +31,36 @@ def fill_templates():
 # A setup method would run too late.
 fill_templates()
 
-@pytest.mark.parametrize('path', glob('workflows/*/outputs-indexing/actual/*'))
+# "*-*" to exclude "prov.json"
+hca_paths = glob('workflows/*/outputs-hca/actual/*-*')
+
+
+@pytest.mark.parametrize('path', hca_paths)
+def test_valid_any_hca_json(path):
+    metadata = json.load(open(path))
+    expected_suffix = metadata['schema_type'] + '.json'
+    if not path.endswith(expected_suffix):
+        self.fail(f'Expected to end with "{expected_suffix}".')
+    described_by = metadata['describedBy']
+    schema_url = urlparse(described_by)
+    cache_path = Path('schema-cache') / schema_url.hostname / schema_url.path[1:]
+    # Remove leading "/" from URL path component.
+    if not os.path.isfile(cache_path):
+        download_to(described_by, cache_path)
+    with open(cache_path) as cache_file:
+        schema = json.load(cache_file)
+        validate(instance=metadata, schema=schema)
+
+
+@pytest.mark.parametrize('path', hca_paths)
+def test_valid_fixed_hca_json(path):
+    metadata = json.load(open(path))
+    hubmap_indexing_schema = json.load(open('hubmap-hca-schema.json'))
+    validate(instance=metadata, schema=hubmap_indexing_schema)
+
+
+indexing_paths = glob('workflows/*/outputs-indexing/actual/*')
+@pytest.mark.parametrize('path', indexing_paths)
 def test_valid_indexing_json(path):
     metadata = json.load(open(path))
     hubmap_indexing_schema = json.load(open('hubmap-indexing-schema.json'))
