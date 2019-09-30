@@ -10,7 +10,7 @@ either in development by Django management scripts, or in production by some API
 - and produce as intermediate output templated HCA-validated JSON describing entities and RDF relating the entities,
 - and as final output flattened JSON ready for Elasticsearch ingest.
 
-![Raw CSV to HCA JSON to ES JSON](data-flow.svg?sanitize=true)
+![Raw CSV to HCA JSON to ES JSON](diagrams/data-flow.svg?sanitize=true)
 
 In production, I think the two templating steps will actually be separated in time,
 with the intermediate output JSON being stored in Neo4J.
@@ -26,7 +26,7 @@ That said, the domain-specific symbology of HCA is easier to understand at a gla
 so we will use it in the workflow examples.
 Here is a demonstration of how the two symbologies correspond:
 
-![Compare HCA to PROV](hca-prov.svg?sanitize=true)
+![Compare HCA to PROV](diagrams/hca-prov.svg?sanitize=true)
 
 (All diagrams in this repo are editable with [draw.io](https://www.draw.io/), either on the web or with their desktop app.)
 

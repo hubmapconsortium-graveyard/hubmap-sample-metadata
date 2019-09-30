@@ -70,14 +70,14 @@ def test_valid_hca_json_their_schema(path):
 @pytest.mark.parametrize('path', hca_paths)
 def test_valid_hca_json_our_schema(path):
     metadata = json.load(open(path))
-    hubmap_indexing_schema = json.load(open('hubmap-hca-schema.json'))
+    hubmap_indexing_schema = json.load(open('schemas/hubmap-hca-schema.json'))
     validate(instance=metadata, schema=hubmap_indexing_schema)
 
 
 @pytest.mark.parametrize('path', indexing_paths)
 def test_valid_indexing_json_our_schema(path):
     metadata = json.load(open(path))
-    hubmap_indexing_schema = json.load(open('hubmap-indexing-schema.json'))
+    hubmap_indexing_schema = json.load(open('schemas/hubmap-indexing-schema.json'))
     validate(instance=metadata, schema=hubmap_indexing_schema)
 
 
