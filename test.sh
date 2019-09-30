@@ -9,11 +9,6 @@ start flake8
 flake8
 end flake8
 
-start cli
-# TODO: Actually test something, if we'll be using these:
-tools/fill_templates.py --help
-end cli
-
-start test.py
-tools/test.py
-end test.py
+start pytest
+pytest --verbose
+end pytest
