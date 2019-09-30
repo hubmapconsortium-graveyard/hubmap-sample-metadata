@@ -4,7 +4,17 @@ This is a test bed for demonstrating how the HCA Metadata Standard and W3C PROV 
 
 ## Roadmap
 
-Eventually, this will be renamed to `hubmap-metadata`, and it will become a tool that could be used either in development by Django management scripts, or in production by some API. It will take as input CSVs and a workflow name, and produce as output templated HCA-valid JSON describing entities and RDF relating the entities.
+Eventually, this will be renamed to `hubmap-metadata`, and it will become a tool that could be used
+either in development by Django management scripts, or in production by some API.
+- It will take as input Metadata CSVs and a workflow name,
+- and produce as intermediate output templated HCA-validated JSON describing entities and RDF relating the entities,
+- and as final output flattened JSON ready for Elasticsearch ingest.
+
+![Raw CSV to HCA JSON to ES JSON](data-flow.svg?sanitize=true)
+
+In production, I think the two templating steps will actually be separated in time,
+with the intermediate output JSON being stored in Neo4J.
+That said, the templating mechanism is similar in both phases, so this continuous flow may be easier to conceptualize.
 
 ## Symbology
 

@@ -12,8 +12,11 @@ from jsonschema import validate
 from jsonschema.exceptions import ValidationError, SchemaError
 import prov
 
+from filler import Filler
+
 
 class BaseTestCase(unittest.TestCase):
+
     hubmap_schema = json.load(open('hubmap-schema.json'))
 
 
@@ -23,10 +26,10 @@ def make_skip_test(description):
     return test
 
 
-def make_json_test(description, dir_path, name):
+def make_validity_test(description, dir_path, name):
     def test(self):
-        with open(Path(dir_path) / name) as json_fixture:
-            metadata = json.load(json_fixture)
+        with open(dir_path / name) as json_output:
+            metadata = json.load(json_output)
             expected_suffix = metadata['schema_type'] + '.json'
             if not name.endswith(expected_suffix):
                 self.fail(f'Expected to end with "{expected_suffix}".')
@@ -49,25 +52,38 @@ def make_json_test(description, dir_path, name):
     return test
 
 
+def make_equality_test(description, dir_path, name):
+    def test(self):
+        with open(dir_path / name) as actual_output:
+            with open(dir_path.parent / 'outputs-expected' / name) as expected_output:
+                self.assertEqual(
+                    json.load(actual_output),
+                    json.load(expected_output)
+                )
+    return test
+
+
 def drop_blank(lines):
     return set(line for line in lines if line.strip())
 
 
 def make_prov_test(description, dir_path, name):
     def test(self):
-        rdf_path = Path(dir_path) / name
-        provenance = prov.read(rdf_path, format='rdf')
+        prov_json_path = dir_path / name
+        provenance = prov.read(prov_json_path, format='json')
         output = StringIO()
+        # In production, we won't output PROV-N,
+        # but for tests, it's easy for a human to read, and easy to compare.
         serializer = prov.serializers.provn.ProvNSerializer(provenance)
         serializer.serialize(output)
         actual = output.getvalue()
         actual_lines = drop_blank(actual.split('\n'))
 
-        with open(Path(dir_path) / 'prov.prov') as prov_fixture:
+        with open(dir_path.parent / 'expected.prov') as prov_fixture:
             expected_lines = drop_blank(prov_fixture.read().split('\n'))
             self.assertEqual(
                 actual_lines, expected_lines,
-                msg=f'Copying this to prov.prov might fix the problem:\n{actual}'
+                msg=f'Expected this PROV:\n{actual}'
             )
     return test
 
@@ -80,21 +96,61 @@ def download_to(url, target):
     os.rename(download_path, target)
 
 
-if __name__ == '__main__':
+def fill_templates(path):
+    for dir, _, file_names in os.walk(path):
+        dir_path = Path(dir)
+        if dir_path.name != 'templates':
+            continue
+
+        # Initialize template filler:
+        input_metadata_path = dir_path.parent / 'inputs' / 'metadata.json'
+        with open(input_metadata_path) as input_metadata:
+            filler = Filler(json.load(input_metadata))
+
+        # Clear outputs from previous run:
+        outputs_dir_path = dir_path.parent / 'outputs'
+        for file in os.listdir(outputs_dir_path):
+            if file != '.gitignore':
+                os.remove(outputs_dir_path / file)
+
+        # And fill it up again:
+        for name in sorted(file_names):
+            if not name.endswith('.jsonnet'):
+                raise Exception(f'Expected only ".jsonnet" files in "{dir_path}", not "{name}"')
+            if 'TODO' in name:
+                continue
+            json_name = name.replace('.jsonnet', '.json')
+            filler.fill(dir_path / name, dir_path.parent / 'outputs' / json_name)
+
+
+def test_outputs(path):
     # Dynamic test creation based on:
     # https://eli.thegreenplace.net/2014/04/02/dynamically-generating-python-test-cases
-    for dir_path, _, file_names in os.walk('workflows'):
-        dynamic_class_name = f'Test_{dir_path}'
+    for dir, _, file_names in os.walk(path):
+        dir_path = Path(dir)
+        if dir_path.name != 'outputs':
+            continue
+        dynamic_class_name = f'Test\t{dir_path}'
         DynamicTestCase = type(dynamic_class_name, (BaseTestCase,), {})
         globals()[dynamic_class_name] = DynamicTestCase
         for name in sorted(file_names):
-            if 'TODO' in name:
-                test_function = make_skip_test('TODO')
+            if name == '.gitignore':
+                pass
+            elif name == 'prov.json':
+                setattr(DynamicTestCase, 'test_prov\t' + name,
+                        make_prov_test('name', dir_path, name))
             elif name.endswith('.json'):
-                test_function = make_json_test('name', dir_path, name)
-            elif name == 'prov.rdf':
-                test_function = make_prov_test('name', dir_path, name)
+                setattr(DynamicTestCase, 'test_validity\t' + name,
+                        make_validity_test('name', dir_path, name))
+                setattr(DynamicTestCase, 'test_equality\t' + name,
+                        make_equality_test('name', dir_path, name))
             else:
-                continue
-            setattr(DynamicTestCase, 'test_' + name, test_function)
+                raise Exception(f'Unexpected file type: "{name}"')
+
     unittest.main(verbosity=2)
+
+
+if __name__ == '__main__':
+    target = 'workflows'
+    fill_templates(target)
+    test_outputs(target)
