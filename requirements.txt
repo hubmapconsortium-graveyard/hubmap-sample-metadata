@@ -3,3 +3,4 @@ flake8==3.7.8
 jsonschema==3.0.2
 prov==1.5.3
 jsonnet==0.14.0
+pytest==5.1.3

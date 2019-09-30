@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["biomaterial", "file", "process", "protocol", "experiment"]
+    },
+    "TODO_placeholder": {}
+  },
+  "required": [
+    "type",
+    "TODO_placeholder"
+  ],
+  "additionalProperties": false
+}

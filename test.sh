@@ -9,6 +9,6 @@ start flake8
 flake8
 end flake8
 
-start test.py
-./test.py
-end test.py
+start pytest
+pytest --verbose
+end pytest
