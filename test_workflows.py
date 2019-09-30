@@ -48,8 +48,8 @@ def test_all_globs_match():
 def test_valid_hca_json_their_schema(path):
     def download_to(url, target):
         download_path = wget.download(url)
-        target_dir = os.path.dirname(target)
-        if not os.path.exists(target_dir):
+        target_dir = target.parent
+        if not target_dir.exists():
             os.makedirs(target_dir)
         os.rename(download_path, target)
     metadata = json.load(open(path))
@@ -60,7 +60,7 @@ def test_valid_hca_json_their_schema(path):
     schema_url = urlparse(described_by)
     cache_path = Path('schema-cache') / schema_url.hostname / schema_url.path[1:]
     # Remove leading "/" from URL path component.
-    if not os.path.isfile(cache_path):
+    if not cache_path.is_file():
         download_to(described_by, cache_path)
     with open(cache_path) as cache_file:
         schema = json.load(cache_file)
