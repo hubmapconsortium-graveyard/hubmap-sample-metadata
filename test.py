@@ -69,19 +69,21 @@ def drop_blank(lines):
 
 def make_prov_test(description, dir_path, name):
     def test(self):
-        rdf_path = dir_path / name
-        provenance = prov.read(rdf_path, format='rdf')
+        prov_json_path = dir_path / name
+        provenance = prov.read(prov_json_path, format='json')
         output = StringIO()
+        # In production, we won't output PROV-N,
+        # but for tests, it's easy for a human to read, and easy to compare.
         serializer = prov.serializers.provn.ProvNSerializer(provenance)
         serializer.serialize(output)
         actual = output.getvalue()
         actual_lines = drop_blank(actual.split('\n'))
 
-        with open(dir_path / 'prov.prov') as prov_fixture:
+        with open(dir_path.parent / 'expected.prov') as prov_fixture:
             expected_lines = drop_blank(prov_fixture.read().split('\n'))
             self.assertEqual(
                 actual_lines, expected_lines,
-                msg=f'Copying this to prov.prov might fix the problem:\n{actual}'
+                msg=f'Expected this PROV:\n{actual}'
             )
     return test
 
@@ -105,7 +107,7 @@ def fill_templates(path):
         with open(input_metadata_path) as input_metadata:
             filler = Filler(json.load(input_metadata))
 
-        # Clear outputs form previous run:
+        # Clear outputs from previous run:
         outputs_dir_path = dir_path.parent / 'outputs'
         for file in os.listdir(outputs_dir_path):
             if file != '.gitignore':
@@ -128,18 +130,22 @@ def test_outputs(path):
         dir_path = Path(dir)
         if dir_path.name != 'outputs':
             continue
-        dynamic_class_name = f'Test_{dir_path}'
+        dynamic_class_name = f'Test\t{dir_path}'
         DynamicTestCase = type(dynamic_class_name, (BaseTestCase,), {})
         globals()[dynamic_class_name] = DynamicTestCase
         for name in sorted(file_names):
-            if name.endswith('.json'):
-                setattr(DynamicTestCase, 'test_validity_' + name,
+            if name == '.gitignore':
+                pass
+            elif name == 'prov.json':
+                setattr(DynamicTestCase, 'test_prov\t' + name,
+                        make_prov_test('name', dir_path, name))
+            elif name.endswith('.json'):
+                setattr(DynamicTestCase, 'test_validity\t' + name,
                         make_validity_test('name', dir_path, name))
-                setattr(DynamicTestCase, 'test_equality_' + name,
+                setattr(DynamicTestCase, 'test_equality\t' + name,
                         make_equality_test('name', dir_path, name))
-            # TODO:
-            # if name == 'prov.rdf':
-            #     test_function = make_prov_test('name', dir_path, name)
+            else:
+                raise Exception(f'Unexpected file type: "{name}"')
 
     unittest.main(verbosity=2)
 
