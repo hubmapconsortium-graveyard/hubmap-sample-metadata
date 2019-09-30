@@ -1,0 +1,18 @@
+document
+  prefix xml <http://www.w3.org/XML/1998/namespace>
+  prefix rdf <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  prefix rdfs <http://www.w3.org/2000/01/rdf-schema#>
+  prefix hca <http://data.humancellatlas.org/>
+  prefix hm-data <http://data.hubmapconsortium.org/>
+
+  wasGeneratedBy(hm-data:00-organ-biomaterial, hm-data:00-extraction-process, -)
+  wasDerivedFrom(hm-data:00-clinical-file, hm-data:00-donor-biomaterial, -, -, -)
+  used(hm-data:00-extraction-process, hm-data:00-donor-biomaterial, -)
+  used(hm-data:00-extraction-process, hm-data:00-extraction-protocol, -)
+  wasDerivedFrom(hm-data:00-organ-biomaterial, hm-data:00-donor-biomaterial, -, -, -)
+  entity(hm-data:00-clinical-file, [prov:type='hca:File'])
+  activity(hm-data:00-extraction-process, -, -, [prov:type='hca:Process'])
+  entity(hm-data:00-extraction-protocol, [prov:type='hca:Protocol'])
+  entity(hm-data:00-organ-biomaterial, [prov:type='hca:Entity'])
+  entity(hm-data:00-donor-biomaterial, [prov:type='hca:Biomaterial'])
+endDocument
