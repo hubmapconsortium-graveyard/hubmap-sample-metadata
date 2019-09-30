@@ -38,10 +38,10 @@ prov_paths = sorted(glob('workflows/*/outputs-hca/actual/prov.json'))
 
 
 def test_all_globs_match():
-    assert len(hca_paths)
-    assert len(indexing_paths)
-    assert len(all_actual_json_paths)
-    assert len(prov_paths)
+    assert hca_paths
+    assert indexing_paths
+    assert all_actual_json_paths
+    assert prov_paths
 
 
 @pytest.mark.parametrize('path', hca_paths)
