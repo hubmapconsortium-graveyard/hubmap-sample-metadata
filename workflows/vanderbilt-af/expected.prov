@@ -1,0 +1,16 @@
+document
+  prefix hm <http://data.hubmapconsortium.org/>
+  prefix rdf <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  prefix rdfs <http://www.w3.org/2000/01/rdf-schema#>
+  prefix xml <http://www.w3.org/XML/1998/namespace>
+
+  activity(hm:00-extraction-process, -, -)
+  entity(hm:00-clinical-file)
+  entity(hm:00-donor-biomaterial)
+  entity(hm:00-extraction-protocol)
+  entity(hm:00-organ-biomaterial)
+  used(hm:00-extraction-process, hm:00-extraction-protocol, -)
+  wasDerivedFrom(hm:00-organ-biomaterial, hm:00-donor-biomaterial, -, -, -)
+  wasDerivedFrom(hm:00-clinical-file, hm:00-donor-biomaterial, -, -, -)
+  wasGeneratedBy(hm:00-organ-biomaterial, hm:00-extraction-process, -)
+endDocument
