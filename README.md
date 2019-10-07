@@ -1,6 +1,13 @@
 # hubmap-sample-metadata
 
-This is a test bed for demonstrating how the HCA Metadata Standard and W3C PROV will be used in HuBMAP.
+This is a home for metadata processing tools for HuBMAP.
+Samples of the inputs we will receive from each data release team will be hosted here,
+along with corresponding sample outputs that can be ingested with the Data Portal API.
+
+There will be many more, but we have begun with three workflows:
+- [Vanderbilt autofluorescence](workflows/vanderbilt-af)
+- [Lightsheet microscopy](workflows/lightsheet)
+- [seqFISH](workflows/seqfish)
 
 ## Roadmap
 
@@ -12,7 +19,7 @@ either in development by Django management scripts, or in production by some API
 
 ![Raw CSV to HCA JSON to ES JSON](diagrams/data-flow.svg?sanitize=true)
 
-In production, I think the two templating steps will actually be separated in time,
+In production, I think the templating steps will actually be separated in time,
 with the intermediate output JSON being stored in Neo4J.
 That said, the templating mechanism is similar in both phases, so this continuous flow may be easier to conceptualize.
 
