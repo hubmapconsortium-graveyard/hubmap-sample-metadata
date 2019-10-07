@@ -5,7 +5,7 @@ Samples of the inputs we will receive from each data release team will be hosted
 along with corresponding sample outputs that can be ingested with the Data Portal API.
 
 There will be many more, but we have begun with three workflows:
-- [Vanderbilt autofluorescence](workflows/vanderbilt-af)
+- [Vanderbilt autofluorescence](workflows/vanderbilt-af) (most developed)
 - [Lightsheet microscopy](workflows/lightsheet)
 - [seqFISH](workflows/seqfish)
 
