@@ -11,16 +11,6 @@ function(_) {
       "prov:entity": "hm:00-extraction-protocol"
     }
   },
-  "wasDerivedFrom": {
-    "_:id2": {
-      "prov:generatedEntity": "hm:00-organ-biomaterial",
-      "prov:usedEntity": "hm:00-donor-biomaterial"
-    },
-    "_:id4": {
-      "prov:generatedEntity": "hm:00-clinical-file",
-      "prov:usedEntity": "hm:00-donor-biomaterial"
-    }
-  },
   "wasGeneratedBy": {
     "_:id3": {
       "prov:entity": "hm:00-organ-biomaterial",
