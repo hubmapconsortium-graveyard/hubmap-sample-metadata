@@ -1,3 +1,7 @@
+## 💥 *Deprecated and archived* 💥 
+
+This was an experiment: we learned some things, but development will not continue in this repo.
+
 # hubmap-sample-metadata
 
 This is a test bed for demonstrating how the HCA Metadata Standard and W3C PROV will be used in HuBMAP.
