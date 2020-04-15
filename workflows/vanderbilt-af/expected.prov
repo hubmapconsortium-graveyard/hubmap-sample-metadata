@@ -10,7 +10,5 @@ document
   entity(hm:00-extraction-protocol)
   entity(hm:00-organ-biomaterial)
   used(hm:00-extraction-process, hm:00-extraction-protocol, -)
-  wasDerivedFrom(hm:00-organ-biomaterial, hm:00-donor-biomaterial, -, -, -)
-  wasDerivedFrom(hm:00-clinical-file, hm:00-donor-biomaterial, -, -, -)
   wasGeneratedBy(hm:00-organ-biomaterial, hm:00-extraction-process, -)
 endDocument
